@@ -11,7 +11,7 @@
 	Note:	全局函数
 *************************************************************************/
 //保证IThreadLocal中的静态变量在g_ThreadLocal之前初始化
-//static IThreadLocal g_ExternThreadLocal;
+static IThreadLocal g_ExternThreadLocal;
 CThreadLocal<TagThreadState> g_ThreadLocal;
 
 TagThreadState* GetThreadState()
@@ -19,8 +19,8 @@ TagThreadState* GetThreadState()
 	return g_ThreadLocal.GetData();
 }
 
+long g_ThreadNum = 0;
 
- 
 UINT MyFunc(void* param)
 {
 	printf("Thread Identify: %d \n", GetThread()->m_dwThreadID);
@@ -31,7 +31,11 @@ int main(int argc, char** argv)
 {
 	for (int i = 0; i < 3; ++i)
 		BeginThread(MyFunc, 0);
-	return 99;
+	
+	while(g_ThreadNum != 3)
+		Sleep(1000);
+	
+	return 0;
 }
 
 

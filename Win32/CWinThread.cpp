@@ -3,6 +3,7 @@
 
 
 
+
 /************************************************************************
 	Note:	全局函数接口
 *************************************************************************/
@@ -44,6 +45,7 @@ void EndThread(UINT nExitCode, BOOL bDel)
 		IThreadLocal::m_pThreadSlotData->DeleteValues(false);
 	}
 
+	InterlockedIncrement(&g_ThreadNum);
 	_endthreadex(nExitCode);
 }
 

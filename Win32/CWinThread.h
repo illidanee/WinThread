@@ -21,7 +21,7 @@ typedef void* tppThreadParam;
 *************************************************************************/
 struct TagThreadState;
 extern TagThreadState* GetThreadState();
-
+extern long  g_ThreadNum;
 
 
 /************************************************************************
