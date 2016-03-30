@@ -12,6 +12,7 @@ IThreadLocal::IThreadLocal()
 IThreadLocal::~IThreadLocal()
 {
 	m_pThreadSlotData->FreeSlot(m_uiSlot);
+	m_uiSlot = 0;
 }
 
 

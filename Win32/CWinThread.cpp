@@ -3,17 +3,17 @@
 
 
 
-
-
 /************************************************************************
 	Note:	全局函数接口
 *************************************************************************/
 CWinThread* BeginThread(TpfThreadPro pFunc, tppThreadParam pParam, LPSECURITY_ATTRIBUTES lpSecurityAttribute, UINT nStackSize, DWORD dwFlag, int priority)
 {
 	CWinThread* pThread = new CWinThread(pFunc, pParam);
-	if (pThread->CreatThread(lpSecurityAttribute, nStackSize, dwFlag | CREATE_SUSPENDED))
+	if (pThread->CreatThread(lpSecurityAttribute, nStackSize, dwFlag | CREATE_SUSPENDED) != 0)
+	{
+		delete pThread;
 		return 0;
-
+	}
 	pThread->SetThreadPriority(priority);
 
 	if (!(dwFlag & CREATE_SUSPENDED))
@@ -34,7 +34,7 @@ void EndThread(UINT nExitCode, BOOL bDel)
 	{
 		if (bDel)
 		{
-			pThread->Delete();
+			delete pThread;
 			pState->m_pCurrentThread = 0;
 		}
 	}
@@ -64,6 +64,10 @@ CWinThread::~CWinThread()
 {
 	if (m_hThread)
 		CloseHandle(m_hThread);
+
+	TagThreadState* pState = GetThreadState();
+	if (pState && pState->m_pCurrentThread == this)
+		pState->m_pCurrentThread = 0;
 }
 CWinThread::operator HANDLE()
 {
@@ -83,7 +87,7 @@ UINT __stdcall CWinThread::ThreadEntry(void* pParam)
 	}
 	catch (...)
 	{
-		pThreadStartUp->err = false;
+		pThreadStartUp->err = true;
 		::SetEvent(pThreadStartUp->event1);
 		EndThread(-1, FALSE);
 	}

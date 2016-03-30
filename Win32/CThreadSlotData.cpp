@@ -196,6 +196,7 @@ void CThreadSlotData::DeleteValues(TagThreadData* pThreadData)
 
 	free(pThreadData->pData);
 	delete pThreadData;
+	pThreadData = 0;
 	TlsSetValue(m_tlsIndex, 0);
 }
 
