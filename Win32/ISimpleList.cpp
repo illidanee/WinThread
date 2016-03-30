@@ -10,10 +10,7 @@ ISimpleList::~ISimpleList()
 
 }
 
-int ISimpleList::IsEmpty() const
-{
-	return m_pHead == 0;
-}
+
 void ISimpleList::AddHead(void* p)
 {
 	*GetNextPtr(p) = m_pHead;
@@ -46,6 +43,21 @@ int ISimpleList::Remove(void* p)
 void* ISimpleList::GetHead() const
 {
 	return m_pHead;
+}
+int ISimpleList::IsEmpty() const
+{
+	return m_pHead == 0;
+}
+void ISimpleList::Clear()
+{
+	//void* pTemp = m_pHead;
+	//while (pTemp)
+	//{
+	//	void* pNext = *GetNextPtr(pTemp);
+	//	delete pTemp;
+	//	pTemp = pNext;
+	//}
+	m_pHead = 0;
 }
 void** ISimpleList::GetNextPtr(void* p) const
 {

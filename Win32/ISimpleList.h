@@ -23,7 +23,7 @@ public:
 	void* GetHead() const ;
 
 	int IsEmpty() const;
-
+	void Clear();
 private:
 	void** GetNextPtr(void* p) const;
 };

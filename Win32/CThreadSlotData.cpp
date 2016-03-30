@@ -38,12 +38,12 @@ void CThreadSlotData::Init()
 }
 void CThreadSlotData::Destory()
 {
-	TagThreadData* pTempList = m_pList->GetHead();
-	while (pTempList)
+	TagThreadData* pThreadData = m_pList->GetHead();
+	while (pThreadData)
 	{
-		TagThreadData* pNext = pTempList->pNext;
-		delete pTempList;
-		pTempList = pNext;
+		TagThreadData* pNext = pThreadData->pNext;
+		DeleteValues(pThreadData);
+		pThreadData = pNext;
 	}
 	delete m_pList;
 
@@ -97,15 +97,15 @@ void CThreadSlotData::FreeSlot(unsigned int uiSlot)
 {
 	EnterCriticalSection(&m_cs);
 
-	TagThreadData* pData = m_pList->GetHead();
-	while (pData)
+	TagThreadData* pThreadData = m_pList->GetHead();
+	while (pThreadData)
 	{
-		if (uiSlot < pData->uiCount)
+		if (uiSlot < pThreadData->uiCount)
 		{
-			delete pData->pData[uiSlot];
-			pData->pData[uiSlot] = 0;
+			delete pThreadData->pData[uiSlot];
+			pThreadData->pData[uiSlot] = 0;
 		}
-		pData = pData->pNext;
+		pThreadData = pThreadData->pNext;
 	}
 	
 	m_pSlotData[uiSlot].uiState = 0;
@@ -122,7 +122,6 @@ void CThreadSlotData::SetValue(unsigned int uiSlot, void* pValue)
 		pThreadData = new TagThreadData();
 		pThreadData->uiCount = 0;
 		pThreadData->pData = 0;
-
 
 		EnterCriticalSection(&m_cs);
 		m_pList->AddHead(pThreadData);
@@ -182,21 +181,18 @@ void CThreadSlotData::DeleteValues(TagThreadData* pThreadData)
 	if (pThreadData == 0)
 		return;
 	
+	EnterCriticalSection(&m_cs);
+	m_pList->Remove(pThreadData);
+	LeaveCriticalSection(&m_cs);
+
 	for (unsigned int i = 1; i < pThreadData->uiCount; ++i)
 	{
 		delete pThreadData->pData[i];
 		pThreadData->pData[i] = 0;
 	}
-
-	EnterCriticalSection(&m_cs);
-
-	m_pList->Remove(pThreadData);
-	
-	LeaveCriticalSection(&m_cs);
-
-	free(pThreadData->pData);
+	free(pThreadData->pData);	
 	delete pThreadData;
-	pThreadData = 0;
+
 	TlsSetValue(m_tlsIndex, 0);
 }
 

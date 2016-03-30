@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		BeginThread(MyFunc, 0);
 	
 	while(g_ThreadNum != 3)
-		Sleep(1000);
+		Sleep(1);
 	
 	return 0;
 }
