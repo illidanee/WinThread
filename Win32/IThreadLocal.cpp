@@ -6,7 +6,7 @@ CThreadSlotData* IThreadLocal::m_pThreadSlotData = new(threadSlotDataBuff)CThrea
 
 IThreadLocal::IThreadLocal()
 {
-	m_uiSlot = m_pThreadSlotData->AllocSlot();
+	 m_pThreadSlotData->AllocSlot(&m_uiSlot);
 }
 
 IThreadLocal::~IThreadLocal()

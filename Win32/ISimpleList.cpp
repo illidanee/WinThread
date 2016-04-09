@@ -1,5 +1,9 @@
 #include "ISimpleList.h"
 
+
+/************************************************************************	
+	Note:	Base Structure
+*************************************************************************/
 ISimpleList::ISimpleList(unsigned int nextOffset)
 {
 	m_uiNextOffset = nextOffset;
@@ -11,6 +15,18 @@ ISimpleList::~ISimpleList()
 }
 
 
+/************************************************************************	
+	Note:	Inner Logic
+*************************************************************************/
+void** ISimpleList::GetNextPtr(void* p) const
+{
+	return (void**)((char*)p + m_uiNextOffset);
+}
+
+
+/************************************************************************	
+	Note:	Public Interface
+*************************************************************************/
 void ISimpleList::AddHead(void* p)
 {
 	*GetNextPtr(p) = m_pHead;
@@ -50,18 +66,7 @@ int ISimpleList::IsEmpty() const
 }
 void ISimpleList::Clear()
 {
-	//void* pTemp = m_pHead;
-	//while (pTemp)
-	//{
-	//	void* pNext = *GetNextPtr(pTemp);
-	//	delete pTemp;
-	//	pTemp = pNext;
-	//}
 	m_pHead = 0;
-}
-void** ISimpleList::GetNextPtr(void* p) const
-{
-	return (void**)((char*)p + m_uiNextOffset);
 }
 
 

@@ -1,5 +1,10 @@
 #include "CThreadSlotData.h"
 
+
+
+/************************************************************************	
+	Note:	Base Structure
+*************************************************************************/
 CThreadSlotData::CThreadSlotData()
 {
 	m_pSlotData = 0;
@@ -28,6 +33,11 @@ void CThreadSlotData::operator delete[](void* p, void* q)
 {
 	p = 0;
 }
+
+
+/************************************************************************	
+	Note:	Public Interface
+*************************************************************************/
 void CThreadSlotData::Init()
 {
 	m_pList = new CSimpleList<TagThreadData>(offsetof(TagThreadData, pNext));
@@ -51,9 +61,7 @@ void CThreadSlotData::Destory()
 	
 	DeleteCriticalSection(&m_cs);
 }
-
-
-unsigned int CThreadSlotData::AllocSlot()
+void CThreadSlotData::AllocSlot(unsigned int* puiSlot)
 {
 	EnterCriticalSection(&m_cs);
 
@@ -81,18 +89,17 @@ unsigned int CThreadSlotData::AllocSlot()
 			}
 
 			memset(m_pSlotData + m_uiMax, 0, (uiNewMax - m_uiMax) * sizeof(TagSlotData));
-			
+
 			m_uiMax = uiNewMax;
 		}
 	}
 
 	m_pSlotData[m_uiIndex].uiState = 1;
 
+	*puiSlot = m_uiIndex;
+
 	LeaveCriticalSection(&m_cs);
-
-	return m_uiIndex;
 }
-
 void CThreadSlotData::FreeSlot(unsigned int uiSlot)
 {
 	EnterCriticalSection(&m_cs);
@@ -112,7 +119,6 @@ void CThreadSlotData::FreeSlot(unsigned int uiSlot)
 
 	LeaveCriticalSection(&m_cs);
 }
-
 void CThreadSlotData::SetValue(unsigned int uiSlot, void* pValue)
 {
 	TagThreadData* pThreadData = (TagThreadData*)TlsGetValue(m_tlsIndex);
@@ -145,7 +151,6 @@ void CThreadSlotData::SetValue(unsigned int uiSlot, void* pValue)
 
 	pThreadData->pData[uiSlot] = pValue;
 }
-
 void* CThreadSlotData::GetValue(unsigned int uiSlot)
 {
 	TagThreadData* pThreadData = (TagThreadData*)TlsGetValue(m_tlsIndex);
@@ -155,7 +160,6 @@ void* CThreadSlotData::GetValue(unsigned int uiSlot)
 
 	return pThreadData->pData[uiSlot];
 }
-
 void CThreadSlotData::DeleteValues(bool bAll)
 {
 	if (bAll)
@@ -175,7 +179,6 @@ void CThreadSlotData::DeleteValues(bool bAll)
 			DeleteValues(pThreadData);
 	}
 }
-
 void CThreadSlotData::DeleteValues(TagThreadData* pThreadData)
 {
 	if (pThreadData == 0)
@@ -185,11 +188,11 @@ void CThreadSlotData::DeleteValues(TagThreadData* pThreadData)
 	m_pList->Remove(pThreadData);
 	LeaveCriticalSection(&m_cs);
 
-	for (unsigned int i = 1; i < pThreadData->uiCount; ++i)
-	{
-		delete pThreadData->pData[i];
-		pThreadData->pData[i] = 0;
-	}
+	//for (unsigned int i = 1; i < pThreadData->uiCount; ++i)
+	//{
+	//	delete pThreadData->pData[i];
+	//	pThreadData->pData[i] = 0;
+	//}
 	free(pThreadData->pData);	
 	delete pThreadData;
 
