@@ -18,7 +18,7 @@ public:
 	Note:	逻辑
 *************************************************************************/
 public:
-	static T* CreateObject();
+	static void* CreateObject();
 	T* GetData();
 };
 
@@ -43,14 +43,14 @@ T* CThreadLocal<T>::operator->()
 	Note:	逻辑
 *************************************************************************/
 template<class T>
-T* CThreadLocal<T>::CreateObject()
+void* CThreadLocal<T>::CreateObject()
 {
 	return new T;
 }
 template<class T>
 T* CThreadLocal<T>::GetData() 
 {
-	return (T*)IThreadLocal::GetData((void* (*)())&CreateObject);
+	return (T*)IThreadLocal::GetData(CreateObject);
 }
 
 #endif
